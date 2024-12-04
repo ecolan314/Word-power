@@ -1,0 +1,94 @@
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    position: relative;
+}
+
+.map {
+    aspect-ratio: 1;
+    height: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    background-color: #497d57;
+    display: flex;
+}
+
+.map_regions {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: transparent;
+}
+
+#map_regions > .region {
+    stroke: #ffffff00;
+    stroke-width: 3px;
+    transition: stroke .5s;
+}
+
+#map_regions > .region.active {
+    stroke: #ffffff30;
+    transition: fill .3s;
+}
+
+#map_regions > .region.hover {
+    stroke: #ffffff20;
+    stroke-width: 3px;
+    transition: stroke 0s;
+}
+
+#map_regions > .region.hover.active {
+    fill: #ffffff20;
+    transition: fill 0s;
+}
+
+#map_regions > .team-one {
+    fill: #577af883;
+}
+
+#map_regions > .team-two {
+    fill: #f857577f;
+}
+
+image.region_plus {
+    display: block;
+    opacity: .6;
+    transition: opacity .5s;
+}
+
+image.hidden{
+    display: none;
+    opacity: .0;
+    transition: opacity .5s;
+}
+
+#map > .region {
+    fill: #497d57;
+    stroke: #497d57;
+    stroke-width: 1;
+}
+
+#map > .water {
+    fill: #6563cc;
+    stroke: #6563cc;
+}
+
+#map > .wheat {
+    fill: #587d49;
+    stroke: #587d49
+}
+
+#map > .rock, #map > .mountain {
+    fill: #a59982;
+    stroke: #a59982;
+}
+
+/* #map > .rock, #map > .mountain {
+    fill: #cac5bc;
+    stroke: #cac5bc;
+} */
