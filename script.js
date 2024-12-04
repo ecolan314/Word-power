@@ -38,16 +38,19 @@ let mapSize = {
 let mapSet = {
     dotsMidDistX: mapSize.sizeX / (mapSize.x),
     dotsMidDistY: mapSize.sizeY / (mapSize.y),
-    dotsDiffX: mapSize.sizeX / (mapSize.x) * 0.5,
-    dotsDiffY: mapSize.sizeY / (mapSize.y) * 0.5,
+    dotsDiffX: mapSize.sizeX / (mapSize.x) * 0.65,
+    dotsDiffY: mapSize.sizeY / (mapSize.y) * 0.65,
     resources: [
+        {name: 'meadow', ico: '', chance: 1},
         {name: 'meadow', ico: '', chance: 1},
         {name: 'meadow', ico: '', chance: 1},
         {name: 'wood', ico: 'images/ico/wood.svg', chance: 1},
         {name: 'fish', ico: 'images/ico/fish.svg', chance: .5},
         {name: 'water', ico: '', chance: .5},
+        {name: 'water', ico: '', chance: .5},
         {name: 'mountain', ico: '', chance: .5},
         {name: 'choco', ico: 'images/ico/choco.svg', chance: .1},
+        {name: 'wheat', ico: 'images/ico/wheat.svg', chance: 1},
         {name: 'wheat', ico: 'images/ico/wheat.svg', chance: 1},
         {name: 'cow', ico: 'images/ico/cow.svg', chance: .7},
         {name: 'coal', ico: 'images/ico/coal.svg', chance: .5},
@@ -236,13 +239,13 @@ function dotStateF(current, firstN, secondN, thirdN, dotNum) {
         i = 4;
     } else if (dotNum === 3 && secondN.type === current.type) {
         i = 5;
-    } 
-    //  else if (thirdN.type === current.type && firstN !== false) {
-    //     i = 6; 
-    // } else if (firstN.type === current.type && thirdN !== false) {
-    //     i = 6; 
-    // } 
-    else {
+    } else if (thirdN.type === current.type && secondN.type ) {
+        i = 6; 
+    } else if (firstN.type === current.type && secondN.type ) {
+        i = 7; 
+    } else if (firstN.type === current.type && thirdN.type === current.type ) {
+        i = 0; 
+    } else {
         i = 0
     }
 
@@ -337,19 +340,45 @@ for(let i = 0; i < regions.length; i++) {
             pathD.push(regions[i].coordRound.dots[counter+1]);
             counter += 2;
         } else if (regions[i].coordRound.dotsState[y] === 6) {
-            y === 0 ? pathD.push(regions[i].coordRound.dots[counter]) : '';
-            pathD.push(' Q');
-            pathD.push(regions[i].coordRound.dots[counter]);
-            pathD.push(' ');
             if (y === 0) {
-                pathD.push(regions[i].near.top.coordRound.dots[7]) ;
+                pathD.push(regions[i].coordRound.dots[7])
+                pathD.push(' Q');
+                pathD.push(regions[i].coordRound.dots[counter]);
+                pathD.push(' ');
+                pathD.push(regions[i].near.top.coordRound.dots[7]);
             } else if (y === 1) {
-                pathD.push(regions[i].near.centerRight.coordRound.dots[1])
+                pathD.push(' Q');
+                pathD.push(regions[i].coordRound.dots[counter]);
+                pathD.push(' ');
+                pathD.push(regions[i].near.centerRight.coordRound.dots[1]);
             } else if (y === 2) {
-                pathD.push(regions[i].near.bottom.coordRound.dots[3]) 
+                pathD.push(' Q');
+                pathD.push(regions[i].coordRound.dots[counter]);
+                pathD.push(' ');
+                pathD.push(regions[i].near.bottom.coordRound.dots[3])
             } else if (y === 3) {
+                pathD.push(' Q');
+                pathD.push(regions[i].coordRound.dots[counter]);
+                pathD.push(' ');
                 pathD.push(regions[i].near.centerLeft.coordRound.dots[5])
             }
+            pathD.push(' L');
+            pathD.push(regions[i].coordRound.dots[counter+1]);
+            counter += 2;
+        } else if (regions[i].coordRound.dotsState[y] === 7) {
+            if (y === 0) {
+                pathD.push(regions[i].near.centerLeft.coordRound.dots[1])
+            } else if (y === 1) {
+                pathD.push(' L');
+                pathD.push(regions[i].near.top.coordRound.dots[3])
+            } else if (y === 2) {
+                pathD.push(' L');
+                pathD.push(regions[i].near.centerRight.coordRound.dots[5])
+            } else if (y === 3) {
+                pathD.push(' L');
+                pathD.push(regions[i].near.bottom.coordRound.dots[7])
+            }
+            
             pathD.push(' Q');
             pathD.push(regions[i].coordRound.dots[counter]);
             pathD.push(' ');
