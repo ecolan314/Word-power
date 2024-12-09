@@ -1,5 +1,39 @@
 let mapContainer = document.querySelector('#map');
 
+let servicePopup = document.createElement('div');
+
+servicePopup.style.display = 'none';
+servicePopup.style.position = 'absolute',
+servicePopup.style.top = 0,
+servicePopup.style.background = '#00000050',
+servicePopup.style.color = '#fff',
+servicePopup.style.padding = '8px 16px',
+servicePopup.style.borderRadius = '16px',
+servicePopup.style.margin = '8px',
+servicePopup.style.opacity = 0,
+servicePopup.style.transition = 'opacity .5s';
+
+document.body.append(servicePopup);
+
+
+let serviceMessage = {
+    open: function(text) {
+        servicePopup.textContent = text;
+        servicePopup.style.display = 'block';
+        servicePopup.style.opacity = 0;
+        let i = setTimeout(() => {
+            servicePopup.style.opacity = 1;
+        }, 10)
+    },
+    close: function() {
+        servicePopup.style.opacity = 0;
+        let i = setTimeout(() => {
+            servicePopup.style.display = 'none';
+            servicePopup.textContent = '';
+        }, 1000)
+    }
+}
+
 let game = {
     teams: {
         q: 0,
@@ -480,12 +514,12 @@ function renderStep () {
 
 
 // question
-    let popup = document.createElement('div'),
-        wrapper = document.createElement('div'),
-        answersWrapper = document.createElement('fieldset'),
-        service = document.createElement('div'),
-        question = document.createElement('div'),
-        questionsQuantity = 10;
+let popup = document.createElement('div'),
+    wrapper = document.createElement('div'),
+    answersWrapper = document.createElement('fieldset'),
+    service = document.createElement('div'),
+    question = document.createElement('div'),
+    questionsQuantity = 10;
 
     document.querySelector('body').append(popup);
     popup.classList.add('popup', 'hidden');
@@ -514,9 +548,10 @@ function renderStep () {
 
     questionNumberData = questionNumberRandom.join(',');
 
+
     fetch ('https://script.google.com/macros/s/AKfycbw_QC1gjSxVZDYJnexQjvl6XiyZcS-PAJ-pHs5pL1u5ctylXphawJy0YxXOjJ3TxB_x/exec?id=' + questionNumberRandom,  {
         mode: 'cors'
-    })
+    }).then(serviceMessage.open('Завантажуємо питання'))
     .then((response) => response.json())
     .then((data) => {
         if (data.goods.length > 0) {
@@ -526,6 +561,7 @@ function renderStep () {
         } 
     })
     .finally(()=>{
+        serviceMessage.close();
         newQuestion();
     })
     
@@ -575,9 +611,4 @@ function renderStep () {
 
     }
 
-
-
-
-
-    console.log(questionData);
 
