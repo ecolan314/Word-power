@@ -5,7 +5,7 @@ let servicePopup = document.createElement('div');
 servicePopup.style.display = 'none';
 servicePopup.style.position = 'absolute',
 servicePopup.style.top = 0,
-servicePopup.style.background = '#00000050',
+servicePopup.style.background = '#00000080',
 servicePopup.style.color = '#fff',
 servicePopup.style.padding = '8px 16px',
 servicePopup.style.borderRadius = '16px',
@@ -23,7 +23,7 @@ let serviceMessage = {
         servicePopup.style.opacity = 0;
         let i = setTimeout(() => {
             servicePopup.style.opacity = 1;
-        }, 10)
+        }, 500)
     },
     close: function() {
         servicePopup.style.opacity = 0;
@@ -40,6 +40,9 @@ let game = {
         all:[]
     },
     whoStep: '',
+    whoStepNow: function() {
+        return this.whoStep
+    },
     nextStepWhoCounter: 0
 };
 
@@ -62,18 +65,20 @@ console.log(game);
 let teamOne = new Team('Огурчик','team-one');
 let teamTwo = new Team('Помідорчик','team-two');
 
+game.whoStep = game.teams.all[0];
+
 let mapSize = {
-    x: 10,
-    y: 10,
+    x: 9,
+    y: 9,
     sizeX: 1000,
     sizeY: 1000,
 };
 
 let mapSet = {
-    dotsMidDistX: mapSize.sizeX / (mapSize.x),
-    dotsMidDistY: mapSize.sizeY / (mapSize.y),
-    dotsDiffX: mapSize.sizeX / (mapSize.x) * 0.65,
-    dotsDiffY: mapSize.sizeY / (mapSize.y) * 0.65,
+    dotsMidDistX: Math.round(mapSize.sizeX / (mapSize.x), -2),
+    dotsMidDistY: Math.round(mapSize.sizeY / (mapSize.y), -2),
+    dotsDiffX:  Math.round(mapSize.sizeX / (mapSize.x) * 0.6, -2),
+    dotsDiffY: Math.round(mapSize.sizeY / (mapSize.y) * 0.6, -2),
     resources: [
         {name: 'meadow', ico: '', chance: 1},
         {name: 'wood', ico: 'images/ico/wood.svg', chance: 1, count: true, group: 'plants'},
@@ -87,7 +92,7 @@ let mapSet = {
         {name: 'gold', ico: 'images/ico/gold.svg', chance: .1, count: true, group: 'resource'},
         {name: 'stone', ico: 'images/ico/stone.svg', chance: .5, count: true, group: 'resource'}
     ],
-    resourcesIcoSize: 48,
+    resourcesIcoSize: 50,
 }
 
 let dots = [];
@@ -209,12 +214,12 @@ for (let y = 0; y < mapSize.y; y++) {
         var yIndexes = getIndexes(arr, i);
         var xIndexes = getIndexes(arr[i], j);
         var thisArr = {
-          topLeft: yIndexes.prev === 9 || xIndexes.prev === 9 ? false : arr[yIndexes.prev][xIndexes.prev],
-          top:  yIndexes.prev === 9 ? false : arr[yIndexes.prev][xIndexes.curr],
-          topRight:  yIndexes.prev === 9 || xIndexes.next === 0 ? false : arr[yIndexes.prev][xIndexes.next],
-          centerLeft:  xIndexes.prev === 9 ? false : arr[yIndexes.curr][xIndexes.prev],
+          topLeft: yIndexes.prev === mapSize.y - 1 || xIndexes.prev === mapSize.x - 1 ? false : arr[yIndexes.prev][xIndexes.prev],
+          top:  yIndexes.prev === mapSize.y - 1 ? false : arr[yIndexes.prev][xIndexes.curr],
+          topRight:  yIndexes.prev === mapSize.y - 1 || xIndexes.next === 0 ? false : arr[yIndexes.prev][xIndexes.next],
+          centerLeft:  xIndexes.prev === mapSize.x - 1 ? false : arr[yIndexes.curr][xIndexes.prev],
           centerRight: xIndexes.next === 0 ? false : arr[yIndexes.curr][xIndexes.next],
-          bottomLeft:  yIndexes.next === 0 || xIndexes.prev === 9 ? false : arr[yIndexes.next][xIndexes.prev],
+          bottomLeft:  yIndexes.next === 0 || xIndexes.prev === mapSize.x - 1 ? false : arr[yIndexes.next][xIndexes.prev],
           bottom:  yIndexes.next === 0 ? false : arr[yIndexes.next][xIndexes.curr],
           bottomRight: yIndexes.next === 0 || xIndexes.next === 0 ? false : arr[yIndexes.next][xIndexes.next],
         }
@@ -282,7 +287,7 @@ function dotStateF(current, firstN, secondN, thirdN, dotNum) {
         i = dotNum + 2;
     }
 
-    secondN.type == false ? i = 0: '';
+    secondN.type === false ? i = 0: '';
 
 
     return i
@@ -458,28 +463,32 @@ regionInteractive.forEach((e) => {
         right: e.region.near.centerRight ? e.region.near.centerRight.id : null,
         bottom: e.region.near.bottom ? e.region.near.bottom.id : null,
         left: e.region.near.centerLeft ? e.region.near.centerLeft.id : null
-
-    }
+    };
+    e.whoCanBuy = [];
     e.id = e.region.id
     e.changeActive = function(team) {
         e.active === false ? e.active = true: e.active = false;
         e.owner === false ?  e.owner = team : e.owner = false;
-        e.region.owner === team;
+        e.region.owner = team;
         if (e.near.left != null && regionInteractive[e.near.left].active == false) {
-            regionIcoInteractive[e.near.left].classList.toggle('hidden');
-            regionInteractive[e.near.left].classList.toggle('active');
+            regionIcoInteractive[e.near.left].classList.remove('hidden');
+            regionInteractive[e.near.left].classList.add('active');
+            regionInteractive[e.near.left].whoCanBuy.push(e.region.owner);
         }
         if (e.near.top != null && regionInteractive[e.near.top].active == false) {
-            regionIcoInteractive[e.near.top].classList.toggle('hidden');
-            regionInteractive[e.near.top].classList.toggle('active');
+            regionIcoInteractive[e.near.top].classList.remove('hidden');
+            regionInteractive[e.near.top].classList.add('active');
+            regionInteractive[e.near.top].whoCanBuy.push(e.region.owner);
         }
         if (e.near.right != null && regionInteractive[e.near.right].active == false) {
-            regionIcoInteractive[e.near.right].classList.toggle('hidden');
-            regionInteractive[e.near.right].classList.toggle('active');
+            regionIcoInteractive[e.near.right].classList.remove('hidden');
+            regionInteractive[e.near.right].classList.add('active');
+            regionInteractive[e.near.right].whoCanBuy.push(e.region.owner);
         }
         if (e.near.bottom != null && regionInteractive[e.near.bottom].active == false) {
-            regionIcoInteractive[e.near.bottom].classList.toggle('hidden');
-            regionInteractive[e.near.bottom].classList.toggle('active');
+            regionIcoInteractive[e.near.bottom].classList.remove('hidden');
+            regionInteractive[e.near.bottom].classList.add('active');
+            regionInteractive[e.near.bottom].whoCanBuy.push(e.region.owner);
         }
         team.regionOwner.includes(e.region) ? team.regionOwner.splice(e.region) : team.regionOwner.push(e.region);
         e.classList.toggle(team.regionStyleName);
@@ -492,11 +501,23 @@ regionInteractive.forEach((e) => {
         e.classList.toggle('hover');
     })
 
+    e.addEventListener('click', () => {
+        if(e.classList.contains('active') && e.whoCanBuy.includes(game.whoStep)) {
+            e.changeActive(game.whoStepNow());
+            e.classList.remove('active');
+            e.ico.classList.add('hidden');
+            nextStep();
+
+        };
+    })
+
     regionInteractiveCounter++;
 })
 
+console.log(regionInteractive);
+
 regionInteractive[0].changeActive(game.teams.all[0]);
-regionInteractive[99].changeActive(game.teams.all[1]);
+regionInteractive[regionInteractive.length - 1].changeActive(game.teams.all[1]);
 
 
 // calc points per step
@@ -510,6 +531,19 @@ function renderStep () {
 
 }
 // step choice
+
+function nextStep(rightWrong) {
+    game.nextStepWhoCounter++;
+    
+    if(game.nextStepWhoCounter === game.teams.all.length) {
+        game.nextStepWhoCounter = 0;
+    }
+    game.whoStep = game.teams.all[game.nextStepWhoCounter];
+    
+    
+    
+    calcPoints();
+}
 
 
 
@@ -562,7 +596,6 @@ let popup = document.createElement('div'),
     })
     .finally(()=>{
         serviceMessage.close();
-        newQuestion();
     })
     
 
@@ -598,9 +631,9 @@ let popup = document.createElement('div'),
                         service.classList.remove('success', 'wrong');
                         service.textContent = "";
                         popup.classList.add('hidden');
-                        nextQuestion++;
-                        newQuestion();
-                    },2000);
+                        
+                    },2000)
+                    .then(nextQuestion++).then(newQuestion());
                 } else {
                     service.textContent = "натисніть ще раз для підтвердження";
                 }
@@ -610,5 +643,9 @@ let popup = document.createElement('div'),
         popup.classList.remove('hidden');
 
     }
+
+
+    console.log(dots);
+    console.log(mapSet)
 
 
