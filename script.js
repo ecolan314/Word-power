@@ -42,21 +42,16 @@ let mapSet = {
     dotsDiffY: mapSize.sizeY / (mapSize.y) * 0.65,
     resources: [
         {name: 'meadow', ico: '', chance: 1},
-        {name: 'meadow', ico: '', chance: 1},
-        {name: 'meadow', ico: '', chance: 1},
-        {name: 'wood', ico: 'images/ico/wood.svg', chance: 1},
-        {name: 'fish', ico: 'images/ico/fish.svg', chance: .5},
-        {name: 'water', ico: '', chance: .5},
+        {name: 'wood', ico: 'images/ico/wood.svg', chance: 1, count: true, group: 'plants'},
+        {name: 'fish', ico: 'images/ico/fish.svg', chance: .5, count: true, group: 'animal'},
         {name: 'water', ico: '', chance: .5},
         {name: 'mountain', ico: '', chance: .5},
-        {name: 'choco', ico: 'images/ico/choco.svg', chance: .1},
-        {name: 'wheat', ico: 'images/ico/wheat.svg', chance: 1},
-        {name: 'wheat', ico: 'images/ico/wheat.svg', chance: 1},
-        {name: 'cow', ico: 'images/ico/cow.svg', chance: .7},
-        {name: 'coal', ico: 'images/ico/coal.svg', chance: .5},
-        {name: 'diamond', ico: 'images/ico/diamond.svg', chance: .1},
-        {name: 'gold', ico: 'images/ico/gold.svg', chance: .1},
-        {name: 'stone', ico: 'images/ico/stone.svg', chance: .5}
+        {name: 'choco', ico: 'images/ico/choco.svg', chance: .1, count: true, group: 'plants'},
+        {name: 'wheat', ico: 'images/ico/wheat.svg', chance: 1, count: true, group: 'plants'},
+        {name: 'cow', ico: 'images/ico/cow.svg', chance: .7, count: true, group: 'animal'},
+        {name: 'diamond', ico: 'images/ico/diamond.svg', chance: .1, count: true, group: 'resource'},
+        {name: 'gold', ico: 'images/ico/gold.svg', chance: .1, count: true, group: 'resource'},
+        {name: 'stone', ico: 'images/ico/stone.svg', chance: .5, count: true, group: 'resource'}
     ],
     resourcesIcoSize: 48,
 }
@@ -469,4 +464,120 @@ regionInteractive.forEach((e) => {
 regionInteractive[0].changeActive(game.teams.all[0]);
 regionInteractive[99].changeActive(game.teams.all[1]);
 
+
+// calc points per step
+function calcPoints () {
+
+}
+
+// render available steps for team
+
+function renderStep () {
+
+}
+// step choice
+
+
+
+// question
+    let popup = document.createElement('div'),
+        wrapper = document.createElement('div'),
+        answersWrapper = document.createElement('fieldset'),
+        service = document.createElement('div'),
+        question = document.createElement('div'),
+        questionsQuantity = 10;
+
+    document.querySelector('body').append(popup);
+    popup.classList.add('popup', 'hidden');
+    popup.append(wrapper);
+    wrapper.classList.add('wrapper');
+    wrapper.append(question);
+    question.classList.add('question');
+    wrapper.append(answersWrapper);
+    answersWrapper.classList.add('answers');
+    wrapper.append(service);
+    service.classList.add('service');
+
+    let questionData = [],
+        questionDataQ = 30,
+        questionNumberData = '',
+        questionNumberRandom = [];
+
+    for(let i = 0; i < questionsQuantity; i++) {
+        let y = Math.floor(Math.random() * questionDataQ);
+        if (questionNumberRandom.includes(y)) {
+            i--;
+        } else {
+            questionNumberRandom.push(y);
+        }
+    }
+
+    questionNumberData = questionNumberRandom.join(',');
+
+    fetch ('https://script.google.com/macros/s/AKfycbw_QC1gjSxVZDYJnexQjvl6XiyZcS-PAJ-pHs5pL1u5ctylXphawJy0YxXOjJ3TxB_x/exec?id=' + questionNumberRandom,  {
+        mode: 'cors'
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        if (data.goods.length > 0) {
+            data.goods.forEach(e => {
+                questionData.push(e[0]);
+            })
+        } 
+    })
+    .finally(()=>{
+        newQuestion();
+    })
+    
+
+    let nextQuestion = 0;
+    let newQuestion = function () {
+        question.textContent = questionData[nextQuestion].Q;
+        answersWrapper.innerHTML = '';
+        for(let i = 0; i < 4; i++) {
+            let variant = document.createElement('div');
+            let input = document.createElement('input');
+            let label = document.createElement('label');
+            answersWrapper.append(variant);
+            variant.classList.add('answer-var');
+            variant.append(input);
+            input.type = 'radio';
+            variant.append(label);
+            let varData = 'V' + (i + 1);
+            label.textContent = questionData[nextQuestion][varData];
+            input.name = 'answer';
+            input.id = varData;
+            label.htmlFor = varData;
+            
+            label.addEventListener('click', (e) => {
+                if (input.checked === true) {
+                    if (input.id === ('V' + questionData[nextQuestion].A)) {
+                        service.classList.add('success');
+                        service.textContent = "відповідь правильна, оберіть новий регіон";
+                    } else {
+                        service.classList.add('wrong');
+                        service.textContent = "ви помилились";
+                    }
+                    setTimeout(() => {
+                        service.classList.remove('success', 'wrong');
+                        service.textContent = "";
+                        popup.classList.add('hidden');
+                        nextQuestion++;
+                        newQuestion();
+                    },2000);
+                } else {
+                    service.textContent = "натисніть ще раз для підтвердження";
+                }
+            })
+        }
+
+        popup.classList.remove('hidden');
+
+    }
+
+
+
+
+
+    console.log(questionData);
 
