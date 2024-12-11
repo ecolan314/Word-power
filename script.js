@@ -2,6 +2,8 @@ let mapContainer = document.querySelector('#map');
 
 let servicePopup = document.createElement('div');
 
+let nextQuestion = 0;
+
 servicePopup.style.display = 'none';
 servicePopup.style.position = 'absolute',
 servicePopup.style.top = 0,
@@ -47,29 +49,11 @@ let game = {
 };
 
 
-class Team {
-    
-    constructor (name, styleName) {
-        this.points = 0;
-        this.regionOwner = [];
-        this.regionStyleName = styleName;
-        this.name = name;
-        game.teams.all[game.teams.q] = this;
-        game.teams.q++;
-    }
-}
 
-console.log(game);
-
-
-let teamOne = new Team('Огурчик','team-one');
-let teamTwo = new Team('Помідорчик','team-two');
-
-game.whoStep = game.teams.all[0];
 
 let mapSize = {
-    x: 9,
-    y: 9,
+    x: 7,
+    y: 7,
     sizeX: 1000,
     sizeY: 1000,
 };
@@ -92,10 +76,57 @@ let mapSet = {
         {name: 'gold', ico: 'images/ico/gold.svg', chance: .1, count: true, group: 'resource'},
         {name: 'stone', ico: 'images/ico/stone.svg', chance: .5, count: true, group: 'resource'}
     ],
-    resourcesIcoSize: 50,
+    resourcesIcoSize: 60,
 }
 
+let resourcesOwnerInner = function() {
+    let y = {};
+    mapSet.resources.forEach((e) => {
+        if (e.count === true) {
+            if(Object.keys(y).includes(e.group)) {
+                if(Object.keys(y[e.group]).includes(e.name)) {} else {
+                    y[e.group][e.name] = 0;
+                }
+            } else {
+                y[e.group] = {};
+                if(Object.keys(y[e.group]).includes(e.name)) {} else {
+                    y[e.group][e.name] = 0;
+                }
+                
+            }
+        }
+    })
+    return y;
+}
+
+
+
+class Team {
+    
+    constructor (name, styleName) {
+        this.points = 0;
+        this.regionOwner = [];
+        this.resourcesOwner = resourcesOwnerInner();
+        this.regionsCanBuy = 0;
+        this.regionStyleName = styleName;
+        this.name = name;
+        game.teams.all[game.teams.q] = this;
+        game.teams.q++;
+    }
+}
+
+
+let teamOne = new Team('Огурчик','team-one');
+let teamTwo = new Team('Помідорчик','team-two');
+
+game.whoStep = game.teams.all[0];
+
+
+
 let dots = [];
+
+
+
 
 
 function randomDist(diff) {
@@ -456,6 +487,7 @@ regionInteractive.forEach((e) => {
     e.ico = regionIcoInteractive[regionInteractiveCounter];
     e.region = regions[regionInteractiveCounter];
     regions[regionInteractiveCounter].regionInteractive = e;
+    e.resources =  regions[regionInteractiveCounter].resources;
     e.active = false;
     e.owner = false;
     e.near = {
@@ -474,6 +506,7 @@ regionInteractive.forEach((e) => {
             regionIcoInteractive[e.near.left].classList.remove('hidden');
             regionInteractive[e.near.left].classList.add('active');
             regionInteractive[e.near.left].whoCanBuy.push(e.region.owner);
+            
         }
         if (e.near.top != null && regionInteractive[e.near.top].active == false) {
             regionIcoInteractive[e.near.top].classList.remove('hidden');
@@ -503,11 +536,7 @@ regionInteractive.forEach((e) => {
 
     e.addEventListener('click', () => {
         if(e.classList.contains('active') && e.whoCanBuy.includes(game.whoStep)) {
-            e.changeActive(game.whoStepNow());
-            e.classList.remove('active');
-            e.ico.classList.add('hidden');
-            nextStep();
-
+            newQuestion(e);
         };
     })
 
@@ -521,8 +550,48 @@ regionInteractive[regionInteractive.length - 1].changeActive(game.teams.all[1]);
 
 
 // calc points per step
-function calcPoints () {
+let calcPoints = function () {
+    game.teams.all.forEach((t) => {
+        t.regionsCanBuy = 0;
+        t.resourcesOwner = resourcesOwnerInner();
+    })
+    regionInteractive.forEach((e) => {
+        e.whoCanBuy.forEach((i) => {
+            game.teams.all.forEach((t) => {
+                if(t === i) {
+                    t.regionsCanBuy ++;
+                }
+            })
 
+        })
+        game.teams.all.forEach((t) => {
+            if(e.resources[0].count === true && t === e.owner) {
+                t.resourcesOwner[e.resources[0].group][e.resources[0].name] ++;
+            }
+            console.log(t);
+        })
+    })
+
+    game.teams.all.forEach((t) => {
+        let p = {
+            regions: 0,
+            resources: 0,
+            group: 0,
+        };
+        for (let group in t.resourcesOwner) {
+            let pMin = 100;
+            for (let resource in t.resourcesOwner[group]) {
+                p.resources += t.resourcesOwner[group][resource];
+                pMin > t.resourcesOwner[group][resource] ? pMin = t.resourcesOwner[group][resource] : '';
+            }
+            p.group += pMin * 2;
+        }
+        p.regions = t.regionOwner.length
+        t.points += p.resources + p.group + p.regions;
+    })
+
+    
+    
 }
 
 // render available steps for team
@@ -537,12 +606,9 @@ function nextStep(rightWrong) {
     
     if(game.nextStepWhoCounter === game.teams.all.length) {
         game.nextStepWhoCounter = 0;
+        calcPoints();
     }
     game.whoStep = game.teams.all[game.nextStepWhoCounter];
-    
-    
-    
-    calcPoints();
 }
 
 
@@ -599,8 +665,8 @@ let popup = document.createElement('div'),
     })
     
 
-    let nextQuestion = 0;
-    let newQuestion = function () {
+
+    let newQuestion = function (newQuestionRegion) {
         question.textContent = questionData[nextQuestion].Q;
         answersWrapper.innerHTML = '';
         for(let i = 0; i < 4; i++) {
@@ -622,7 +688,12 @@ let popup = document.createElement('div'),
                 if (input.checked === true) {
                     if (input.id === ('V' + questionData[nextQuestion].A)) {
                         service.classList.add('success');
-                        service.textContent = "відповідь правильна, оберіть новий регіон";
+                        service.textContent = "відповідь правильна, ви захопили новий регіон";
+                        newQuestionRegion.changeActive(game.whoStepNow());
+                        newQuestionRegion.classList.remove('active');
+                        newQuestionRegion.ico.classList.add('hidden');
+                        newQuestionRegion.whoCanBuy = [];
+                        
                     } else {
                         service.classList.add('wrong');
                         service.textContent = "ви помилились";
@@ -631,9 +702,9 @@ let popup = document.createElement('div'),
                         service.classList.remove('success', 'wrong');
                         service.textContent = "";
                         popup.classList.add('hidden');
-                        
+                        nextStep();
+                        nextQuestion++;
                     },2000)
-                    .then(nextQuestion++).then(newQuestion());
                 } else {
                     service.textContent = "натисніть ще раз для підтвердження";
                 }
@@ -643,9 +714,5 @@ let popup = document.createElement('div'),
         popup.classList.remove('hidden');
 
     }
-
-
-    console.log(dots);
-    console.log(mapSet)
 
 
