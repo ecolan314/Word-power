@@ -569,7 +569,6 @@ let calcPoints = function () {
             if(e.resources[0].count === true && t === e.owner) {
                 t.resourcesOwner[e.resources[0].group][e.resources[0].name] ++;
             }
-            console.log(t);
         })
     })
 
@@ -638,7 +637,7 @@ let popup = document.createElement('div'),
     service.classList.add('service');
 
     let questionData = [],
-        questionDataQ = 30,
+        questionDataQ = 79,
         questionNumberData = '',
         questionNumberRandomAll = [];
 
