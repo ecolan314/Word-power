@@ -45,7 +45,8 @@ let game = {
     whoStepNow: function() {
         return this.whoStep
     },
-    nextStepWhoCounter: 0
+    nextStepWhoCounter: 0,
+    qWasNum: 0
 };
 
 
@@ -609,6 +610,10 @@ function nextStep(rightWrong) {
         calcPoints();
     }
     game.whoStep = game.teams.all[game.nextStepWhoCounter];
+
+    if(nextQuestion > questionData.length - 5) {
+        loadNewQuestions();
+    }
 }
 
 
@@ -635,34 +640,44 @@ let popup = document.createElement('div'),
     let questionData = [],
         questionDataQ = 30,
         questionNumberData = '',
-        questionNumberRandom = [];
+        questionNumberRandomAll = [];
 
-    for(let i = 0; i < questionsQuantity; i++) {
-        let y = Math.floor(Math.random() * questionDataQ);
-        if (questionNumberRandom.includes(y)) {
-            i--;
-        } else {
-            questionNumberRandom.push(y);
+    let loadNewQuestions = function() {
+        let questionNumberRandom = [];
+
+        for(let i = 0; i < questionsQuantity; i++) {
+            let y = Math.floor(Math.random() * questionDataQ);
+            if (questionNumberRandomAll.includes(y)) {
+                i--;
+            } else {
+                questionNumberRandom.push(y);
+                questionNumberRandomAll.push(y);
+            }
         }
+    
+        questionNumberData = questionNumberRandom.join(',');
+    
+    
+        fetch ('https://script.google.com/macros/s/AKfycbw_QC1gjSxVZDYJnexQjvl6XiyZcS-PAJ-pHs5pL1u5ctylXphawJy0YxXOjJ3TxB_x/exec?id=' + questionNumberRandom,  {
+            mode: 'cors'
+        }).then(serviceMessage.open('Завантажуємо питання'))
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.goods.length > 0) {
+                data.goods.forEach(e => {
+                    questionData.push(e[0]);
+                })
+            } 
+        })
+        .finally(()=>{
+            serviceMessage.close();
+        })
+        
     }
 
-    questionNumberData = questionNumberRandom.join(',');
+    loadNewQuestions();
 
 
-    fetch ('https://script.google.com/macros/s/AKfycbw_QC1gjSxVZDYJnexQjvl6XiyZcS-PAJ-pHs5pL1u5ctylXphawJy0YxXOjJ3TxB_x/exec?id=' + questionNumberRandom,  {
-        mode: 'cors'
-    }).then(serviceMessage.open('Завантажуємо питання'))
-    .then((response) => response.json())
-    .then((data) => {
-        if (data.goods.length > 0) {
-            data.goods.forEach(e => {
-                questionData.push(e[0]);
-            })
-        } 
-    })
-    .finally(()=>{
-        serviceMessage.close();
-    })
     
 
 
