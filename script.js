@@ -594,7 +594,11 @@ let calcPoints = function (status) {
             p.group += pMin;
         }
         p.regions = t.regionOwner.length;
-        status === 'preLoad' ? '' : (t.points += p.resources + p.group + p.regions);
+        if (status === 'preLoad' ) {
+
+        } else {
+            t.points += p.resources + p.group + p.regions;
+        } 
         t.pointsData = p;
         t.pointsData.total = p.resources + p.group + p.regions;
     });
@@ -616,6 +620,8 @@ function nextStep() {
     if(game.nextStepWhoCounter === game.teams.all.length) {
         game.nextStepWhoCounter = 0;
         calcPoints();
+    } else {
+        calcPoints('preLoad')
     }
     game.whoStep = game.teams.all[game.nextStepWhoCounter];
 
