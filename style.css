@@ -1,23 +1,46 @@
 body {
     width: 100vw;
     height: 100vh;
-    display: flex;
+    display: block;
+    position: relative;
     justify-content: center;
     font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .container {
     position: relative;
+    display: flex;
+    width: 100vw;
 }
 
 .map {
-    aspect-ratio: 1;
-    height: 100%;
-    max-width: 100vw;
-    max-height: 100vh;
     background-color: #497d57;
     display: flex;
+    width: 100%;
+    max-height: 100vh;
 }
+
+.map > svg {
+    width: 100%;
+    height: 100vh;
+}
+
+.wrapper {
+    display: flex;
+    position: relative;
+    width: 100%;
+    max-height: 100vh;
+}
+
+@media(max-aspect-ratio:1) {
+    .container {
+        flex-wrap: wrap;
+    }
+    .map > svg {
+        height: auto;
+    }
+}
+
 
 .map_regions {
     position: absolute;
@@ -108,6 +131,7 @@ image.hidden{
     background: #00000030;
     opacity: 1;
     transition: opacity .5s;
+    top: 0;
 }
 
 .popup.hidden {
@@ -123,6 +147,8 @@ image.hidden{
     min-width: 40%;
     margin: 8px;
     box-shadow: 0px 0px 8px #00000050;
+    display: block;
+    max-width: 600px;
 }
 
 .popup .wrapper .question {
@@ -171,4 +197,89 @@ image.hidden{
 
 .popup .wrapper:has(.success) .service, .popup .wrapper:has(.wrong) .service {
     color: #fff;
+}
+
+
+
+/*----DASHBOARD------*/
+
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    align-content:center;
+    background: #497d57;
+    
+}
+
+.dashboard .team {
+    background: #ff6d6d;
+    padding: 4px 12px;
+    width: 100%;
+    max-width: 400px;
+    min-width: 240px;
+}
+
+.dashboard .team.team-one {
+    background: #577af8;
+}
+.dashboard .team.team-two {
+    background: #f85757;
+}
+
+.dashboard .header, .dashboard .addition  {
+    display: flex;
+    justify-content: space-between;
+    text-transform: uppercase;
+    padding: 4px 0;
+}
+
+.dashboard .addition .total::before {
+    content: "+";
+}
+
+.dashboard .header {
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.dashboard .resources {
+    background: #fff;
+    padding: 4px;
+    margin:  8px -4px 0px;
+    border-radius: 12px
+}
+
+.dashboard .resources .group {
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard .resources .group .item {
+    display: flex;
+    padding: 4px 8px;
+    align-items: center;
+}
+
+
+.dashboard .resources .group .item img {
+    width: 24px;
+}
+
+.dashboard .resources .group .item .number {
+    padding-left: 4px;
+}
+
+.dashboard .resources .group .item .number::before {
+    content: 'X';
+    padding-right: 4px;
+    color: #aaa;
+}
+
+.dashboard .resources .group.total { 
+    display: grid;
+    justify-items: center;
+}
+
+.dashboard .resources .group:not(:last-child) {
+    border-bottom: solid 1px #00000050;
 }

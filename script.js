@@ -23,13 +23,13 @@ let serviceMessage = {
         servicePopup.textContent = text;
         servicePopup.style.display = 'block';
         servicePopup.style.opacity = 0;
-        let i = setTimeout(() => {
+        setTimeout(() => {
             servicePopup.style.opacity = 1;
         }, 500)
     },
     close: function() {
         servicePopup.style.opacity = 0;
-        let i = setTimeout(() => {
+        setTimeout(() => {
             servicePopup.style.display = 'none';
             servicePopup.textContent = '';
         }, 1000)
@@ -106,6 +106,12 @@ class Team {
     
     constructor (name, styleName) {
         this.points = 0;
+        this.pointsData = {
+            resources: 0,
+            group: 0,
+            regions: 0,
+            total: 0
+        };
         this.regionOwner = [];
         this.resourcesOwner = resourcesOwnerInner();
         this.regionsCanBuy = 0;
@@ -325,8 +331,6 @@ function dotStateF(current, firstN, secondN, thirdN, dotNum) {
     return i
 }
 
-console.log(regions);
-
 let polygonInner, icoInner;
 let polygonInnerNew, icoInnerNew;
 
@@ -527,11 +531,12 @@ regionInteractive.forEach((e) => {
         team.regionOwner.includes(e.region) ? team.regionOwner.splice(e.region) : team.regionOwner.push(e.region);
         e.classList.toggle(team.regionStyleName);
         
+        
     };
-    e.addEventListener('mouseover', (i) => {
+    e.addEventListener('mouseover', () => {
         e.classList.toggle('hover');
     })
-    e.addEventListener('mouseout', (i) => {
+    e.addEventListener('mouseout', () => {
         e.classList.toggle('hover');
     })
 
@@ -539,7 +544,7 @@ regionInteractive.forEach((e) => {
         if(e.classList.contains('active') && e.whoCanBuy.includes(game.whoStep)) {
             newQuestion(e);
         };
-    })
+    });
 
     regionInteractiveCounter++;
 })
@@ -551,11 +556,12 @@ regionInteractive[regionInteractive.length - 1].changeActive(game.teams.all[1]);
 
 
 // calc points per step
-let calcPoints = function () {
+let calcPoints = function (status) {
     game.teams.all.forEach((t) => {
         t.regionsCanBuy = 0;
         t.resourcesOwner = resourcesOwnerInner();
     })
+
     regionInteractive.forEach((e) => {
         e.whoCanBuy.forEach((i) => {
             game.teams.all.forEach((t) => {
@@ -572,6 +578,7 @@ let calcPoints = function () {
         })
     })
 
+
     game.teams.all.forEach((t) => {
         let p = {
             regions: 0,
@@ -584,11 +591,13 @@ let calcPoints = function () {
                 p.resources += t.resourcesOwner[group][resource];
                 pMin > t.resourcesOwner[group][resource] ? pMin = t.resourcesOwner[group][resource] : '';
             }
-            p.group += pMin * 2;
+            p.group += pMin;
         }
-        p.regions = t.regionOwner.length
-        t.points += p.resources + p.group + p.regions;
-    })
+        p.regions = t.regionOwner.length;
+        status === 'preLoad' ? '' : (t.points += p.resources + p.group + p.regions);
+        t.pointsData = p;
+        t.pointsData.total = p.resources + p.group + p.regions;
+    });
 
     
     
@@ -601,7 +610,7 @@ function renderStep () {
 }
 // step choice
 
-function nextStep(rightWrong) {
+function nextStep() {
     game.nextStepWhoCounter++;
     
     if(game.nextStepWhoCounter === game.teams.all.length) {
@@ -698,7 +707,7 @@ let popup = document.createElement('div'),
             input.id = varData;
             label.htmlFor = varData;
             
-            label.addEventListener('click', (e) => {
+            label.addEventListener('click', () => {
                 if (input.checked === true) {
                     if (input.id === ('V' + questionData[nextQuestion].A)) {
                         service.classList.add('success');
@@ -710,7 +719,7 @@ let popup = document.createElement('div'),
                         
                     } else {
                         service.classList.add('wrong');
-                        service.textContent = "ви помилились";
+                        service.textContent = `ви помилились, відповідь: ${questionData[nextQuestion][('V' + questionData[nextQuestion].A)]}`;
                     }
                     setTimeout(() => {
                         service.classList.remove('success', 'wrong');
@@ -718,6 +727,7 @@ let popup = document.createElement('div'),
                         popup.classList.add('hidden');
                         nextStep();
                         nextQuestion++;
+                        dashboardGenerate();
                     },2000)
                 } else {
                     service.textContent = "натисніть ще раз для підтвердження";
@@ -728,5 +738,78 @@ let popup = document.createElement('div'),
         popup.classList.remove('hidden');
 
     }
+
+
+// DASHBOARD
+
+let dashboardContainer = document.querySelector('.dashboard');
+
+let dashboardGenerate = function() {
+    dashboardContainer.innerHTML = '';
+    game.teams.all.forEach((e) => {
+        let resourcesInner = '';
+        for(let prop in e.resourcesOwner) {
+            resourcesInner += `<div class="group">`;
+            for(let res in e.resourcesOwner[prop]) {
+                resourcesInner += `<div class="item">
+                    <img src="images/ico/${res}.svg" alt="${res}">
+                    <span class="number">${e.resourcesOwner[prop][res]}</span>
+                </div>`;
+            };
+            resourcesInner += `</div>`;
+        }
+
+
+        dashboardContainer.insertAdjacentHTML('beforeend', 
+            `
+            <div class="team ${e.regionStyleName}">
+                <div class="header">
+                    <div class="name">
+                        ${e.name}
+                    </div>
+                    <div class="total">
+                        ${e.points}
+                    </div>
+                </div>
+                <div class="resources">
+                    ${resourcesInner}
+                    <div class="group total">
+                        <div class="item">
+                            <span>Колекцій</span>
+                            <span class="number">${e.pointsData.group}</span>
+                        </div>
+                        <div class="item">
+                            <span>Регіонів</span>
+                            <span class="number">${e.pointsData.regions}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="addition">
+                    <div class="name">
+                        За наступний хід
+                    </div>
+                    <div class="total">
+                        ${e.pointsData.total}
+                    </div>
+                </div>
+            </div>
+        `
+    
+        ) 
+    })
+}
+
+
+
+
+
+console.log(game.teams);
+calcPoints('preLoad');
+dashboardGenerate();
+
+
+
+
+
 
 
