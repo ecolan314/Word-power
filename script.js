@@ -53,8 +53,8 @@ let game = {
 
 
 let mapSize = {
-    x: 4,
-    y: 4,
+    x: 9,
+    y: 9,
     sizeX: 1000,
     sizeY: 1000,
 };
