@@ -1,16 +1,17 @@
 body {
-    width: 100vw;
-    height: 100vh;
-    display: block;
+    display: flex;
     position: relative;
     justify-content: center;
+    background-color: #497d57;
     font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .container {
     position: relative;
-    display: flex;
-    width: 100vw;
+    display: grid;
+    width: 100%;
+    max-width: 1300px;
+    grid-template-columns: 1fr 300px; 
 }
 
 .map {
@@ -35,6 +36,8 @@ body {
 @media(max-aspect-ratio:1) {
     .container {
         flex-wrap: wrap;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
     }
     .map > svg {
         height: auto;
@@ -55,9 +58,24 @@ body {
     transition: stroke .5s;
 }
 
-#map_regions > .region.active {
+#map_regions > .region_plus {
+    opacity: 0;
+    display: block;
+    transition: opacity .5s;
+}
+
+#map_regions > .region_plus.hidden{
+    display: none;
+    opacity: .0;
+    transition: opacity .5s;
+}
+
+#map_regions.team-one > .region.active.team-one, #map_regions.team-two > .region.active.team-two  {
     stroke: #ffffff30;
     transition: fill .3s;
+}
+#map_regions.team-one > .region_plus.team-one, #map_regions.team-two > .region_plus.team-two {
+    opacity: .6;
 }
 
 #map_regions > .region.hover {
@@ -71,24 +89,13 @@ body {
     transition: fill 0s;
 }
 
-#map_regions > .team-one {
+#map_regions > .team-one:not(.active) {
     fill: #577af883;
 }
 
-#map_regions > .team-two {
+
+#map_regions > .team-two:not(.active) {
     fill: #f857577f;
-}
-
-image.region_plus {
-    display: block;
-    opacity: .6;
-    transition: opacity .5s;
-}
-
-image.hidden{
-    display: none;
-    opacity: .0;
-    transition: opacity .5s;
 }
 
 #map > .region {
@@ -208,15 +215,16 @@ image.hidden{
     flex-wrap: wrap;
     align-content:center;
     background: #497d57;
-    
+    width: 100%;
+    justify-content: center;
 }
 
 .dashboard .team {
     background: #ff6d6d;
     padding: 4px 12px;
     width: 100%;
-    max-width: 400px;
-    min-width: 240px;
+    max-width:300px;
+    min-width: 200px;
 }
 
 .dashboard .team.team-one {

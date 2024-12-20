@@ -53,8 +53,8 @@ let game = {
 
 
 let mapSize = {
-    x: 7,
-    y: 7,
+    x: 9,
+    y: 9,
     sizeX: 1000,
     sizeY: 1000,
 };
@@ -66,8 +66,10 @@ let mapSet = {
     dotsDiffY: Math.round(mapSize.sizeY / (mapSize.y) * 0.6, -2),
     resources: [
         {name: 'meadow', ico: '', chance: 1},
+        {name: 'meadow', ico: '', chance: 1},
         {name: 'wood', ico: 'images/ico/wood.svg', chance: 1, count: true, group: 'plants'},
         {name: 'fish', ico: 'images/ico/fish.svg', chance: .5, count: true, group: 'animal'},
+        {name: 'water', ico: '', chance: .5},
         {name: 'water', ico: '', chance: .5},
         {name: 'mountain', ico: '', chance: .5},
         {name: 'choco', ico: 'images/ico/choco.svg', chance: .1, count: true, group: 'plants'},
@@ -472,8 +474,6 @@ for(let i = 0; i < regions.length; i++) {
     for (let y = 0; y < regions[i].coord.length; y++){
         y === 0 ? '': pathD.push(' L') ;
         pathD.push(regions[i].coord[y]);
-
-        // pathD.push('A3,3 0 0,0 0,0 ');
     }
     polygonInner += `<path d = "M ${pathD.join('')} Z"  class="${regions[i].style.join(' ')} region-interactive"/>`;
     icoInner += `<image xlink:href="images/ico/plus.svg" x="${regions[i].middleCoord[0]-mapSet.resourcesIcoSize/2}" y="${regions[i].middleCoord[1]-mapSet.resourcesIcoSize/2}px" class="region_plus hidden region-ico-interactive" height="${mapSet.resourcesIcoSize}px" width="${mapSet.resourcesIcoSize}px"/>`;
@@ -510,26 +510,35 @@ regionInteractive.forEach((e) => {
         if (e.near.left != null && regionInteractive[e.near.left].active == false) {
             regionIcoInteractive[e.near.left].classList.remove('hidden');
             regionInteractive[e.near.left].classList.add('active');
+            regionInteractive[e.near.left].classList.add(e.region.owner.regionStyleName);
+            regionIcoInteractive[e.near.left].classList.add(e.region.owner.regionStyleName);
             regionInteractive[e.near.left].whoCanBuy.push(e.region.owner);
-            
         }
         if (e.near.top != null && regionInteractive[e.near.top].active == false) {
             regionIcoInteractive[e.near.top].classList.remove('hidden');
             regionInteractive[e.near.top].classList.add('active');
+            regionInteractive[e.near.top].classList.add(e.region.owner.regionStyleName);
+            regionIcoInteractive[e.near.top].classList.add(e.region.owner.regionStyleName);
             regionInteractive[e.near.top].whoCanBuy.push(e.region.owner);
         }
         if (e.near.right != null && regionInteractive[e.near.right].active == false) {
             regionIcoInteractive[e.near.right].classList.remove('hidden');
             regionInteractive[e.near.right].classList.add('active');
+            regionInteractive[e.near.right].classList.add(e.region.owner.regionStyleName);
+            regionIcoInteractive[e.near.right].classList.add(e.region.owner.regionStyleName);
             regionInteractive[e.near.right].whoCanBuy.push(e.region.owner);
         }
         if (e.near.bottom != null && regionInteractive[e.near.bottom].active == false) {
             regionIcoInteractive[e.near.bottom].classList.remove('hidden');
             regionInteractive[e.near.bottom].classList.add('active');
+            regionInteractive[e.near.bottom].classList.add(e.region.owner.regionStyleName);
+            regionIcoInteractive[e.near.bottom].classList.add(e.region.owner.regionStyleName);
             regionInteractive[e.near.bottom].whoCanBuy.push(e.region.owner);
         }
         team.regionOwner.includes(e.region) ? team.regionOwner.splice(e.region) : team.regionOwner.push(e.region);
-        e.classList.toggle(team.regionStyleName);
+        e.classList.add(team.regionStyleName);
+        e.ico.classList.add('hidden');
+        
         
         
     };
@@ -553,6 +562,8 @@ console.log(regionInteractive);
 
 regionInteractive[0].changeActive(game.teams.all[0]);
 regionInteractive[regionInteractive.length - 1].changeActive(game.teams.all[1]);
+
+document.querySelector('#map_regions').classList.add(game.teams.all[game.nextStepWhoCounter].regionStyleName);
 
 
 // calc points per step
@@ -615,7 +626,11 @@ function renderStep () {
 // step choice
 
 function nextStep() {
+
+    
     game.nextStepWhoCounter++;
+
+    document.querySelector('#map_regions').classList.remove(game.teams.all[game.nextStepWhoCounter - 1].regionStyleName);
     
     if(game.nextStepWhoCounter === game.teams.all.length) {
         game.nextStepWhoCounter = 0;
@@ -624,6 +639,9 @@ function nextStep() {
         calcPoints('preLoad')
     }
     game.whoStep = game.teams.all[game.nextStepWhoCounter];
+
+    
+    document.querySelector('#map_regions').classList.add(game.teams.all[game.nextStepWhoCounter].regionStyleName);
 
     if(nextQuestion > questionData.length - 5) {
         loadNewQuestions();
@@ -672,7 +690,7 @@ let popup = document.createElement('div'),
         questionNumberData = questionNumberRandom.join(',');
     
     
-        fetch ('https://script.google.com/macros/s/AKfycbw_QC1gjSxVZDYJnexQjvl6XiyZcS-PAJ-pHs5pL1u5ctylXphawJy0YxXOjJ3TxB_x/exec?id=' + questionNumberRandom,  {
+        fetch ('https://script.google.com/macros/s/AKfycbwOxh0XQ04yTU3w5mIqA_x-3B-o8yAjHcdTbg_9rvwo5iuvCqcO1Ym24iZVQ8pkh4uO/exec?tab=eng-word&id=' + questionNumberRandom,  {
             mode: 'cors'
         }).then(serviceMessage.open('Завантажуємо питання'))
         .then((response) => response.json())
