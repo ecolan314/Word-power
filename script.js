@@ -53,8 +53,8 @@ let game = {
 
 
 let mapSize = {
-    x: 9,
-    y: 9,
+    x: 4,
+    y: 4,
     sizeX: 1000,
     sizeY: 1000,
 };
@@ -536,6 +536,9 @@ regionInteractive.forEach((e) => {
             regionInteractive[e.near.bottom].whoCanBuy.push(e.region.owner);
         }
         team.regionOwner.includes(e.region) ? team.regionOwner.splice(e.region) : team.regionOwner.push(e.region);
+        game.teams.all.forEach((t) => {
+            e.classList.remove(t.regionStyleName);
+        })
         e.classList.add(team.regionStyleName);
         e.ico.classList.add('hidden');
         

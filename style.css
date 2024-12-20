@@ -75,7 +75,7 @@ body {
     transition: fill .3s;
 }
 #map_regions.team-one > .region_plus.team-one, #map_regions.team-two > .region_plus.team-two {
-    opacity: .6;
+    opacity: .8;
 }
 
 #map_regions > .region.hover {
