@@ -53,8 +53,8 @@ let game = {
 
 
 let mapSize = {
-    x: 9,
-    y: 9,
+    x: 8,
+    y: 8,
     sizeX: 1000,
     sizeY: 1000,
 };
@@ -75,11 +75,13 @@ let mapSet = {
         {name: 'choco', ico: 'images/ico/choco.svg', chance: .1, count: true, group: 'plants'},
         {name: 'wheat', ico: 'images/ico/wheat.svg', chance: 1, count: true, group: 'plants'},
         {name: 'cow', ico: 'images/ico/cow.svg', chance: .7, count: true, group: 'animal'},
+        {name: 'chicken', ico: 'images/ico/chicken.svg', chance: .7, count: true, group: 'animal'},
         {name: 'diamond', ico: 'images/ico/diamond.svg', chance: .1, count: true, group: 'resource'},
         {name: 'gold', ico: 'images/ico/gold.svg', chance: .1, count: true, group: 'resource'},
         {name: 'stone', ico: 'images/ico/stone.svg', chance: .5, count: true, group: 'resource'}
     ],
     resourcesIcoSize: 60,
+    resourcesIcoLink: {}
 }
 
 let resourcesOwnerInner = function() {
@@ -89,11 +91,13 @@ let resourcesOwnerInner = function() {
             if(Object.keys(y).includes(e.group)) {
                 if(Object.keys(y[e.group]).includes(e.name)) {} else {
                     y[e.group][e.name] = 0;
+                    mapSet.resourcesIcoLink[e.name] = e.ico;
                 }
             } else {
                 y[e.group] = {};
                 if(Object.keys(y[e.group]).includes(e.name)) {} else {
                     y[e.group][e.name] = 0;
+                    mapSet.resourcesIcoLink[e.name] = e.ico;
                 }
                 
             }
@@ -117,6 +121,7 @@ class Team {
         this.regionOwner = [];
         this.resourcesOwner = resourcesOwnerInner();
         this.regionsCanBuy = 0;
+        this.regionsCanBuyAll = [];
         this.regionStyleName = styleName;
         this.name = name;
         game.teams.all[game.teams.q] = this;
@@ -513,6 +518,9 @@ regionInteractive.forEach((e) => {
             regionInteractive[e.near.left].classList.add(e.region.owner.regionStyleName);
             regionIcoInteractive[e.near.left].classList.add(e.region.owner.regionStyleName);
             regionInteractive[e.near.left].whoCanBuy.push(e.region.owner);
+            if(e.region.owner.regionsCanBuyAll.includes(regionInteractive[e.near.left]) === false) {
+                e.region.owner.regionsCanBuyAll.push(regionInteractive[e.near.left])
+            };
         }
         if (e.near.top != null && regionInteractive[e.near.top].active == false) {
             regionIcoInteractive[e.near.top].classList.remove('hidden');
@@ -520,6 +528,9 @@ regionInteractive.forEach((e) => {
             regionInteractive[e.near.top].classList.add(e.region.owner.regionStyleName);
             regionIcoInteractive[e.near.top].classList.add(e.region.owner.regionStyleName);
             regionInteractive[e.near.top].whoCanBuy.push(e.region.owner);
+            if(e.region.owner.regionsCanBuyAll.includes(regionInteractive[e.near.top]) === false) {
+                e.region.owner.regionsCanBuyAll.push(regionInteractive[e.near.top])
+            };
         }
         if (e.near.right != null && regionInteractive[e.near.right].active == false) {
             regionIcoInteractive[e.near.right].classList.remove('hidden');
@@ -527,6 +538,9 @@ regionInteractive.forEach((e) => {
             regionInteractive[e.near.right].classList.add(e.region.owner.regionStyleName);
             regionIcoInteractive[e.near.right].classList.add(e.region.owner.regionStyleName);
             regionInteractive[e.near.right].whoCanBuy.push(e.region.owner);
+            if(e.region.owner.regionsCanBuyAll.includes(regionInteractive[e.near.right]) === false) {
+                e.region.owner.regionsCanBuyAll.push(regionInteractive[e.near.right])
+            };
         }
         if (e.near.bottom != null && regionInteractive[e.near.bottom].active == false) {
             regionIcoInteractive[e.near.bottom].classList.remove('hidden');
@@ -534,11 +548,17 @@ regionInteractive.forEach((e) => {
             regionInteractive[e.near.bottom].classList.add(e.region.owner.regionStyleName);
             regionIcoInteractive[e.near.bottom].classList.add(e.region.owner.regionStyleName);
             regionInteractive[e.near.bottom].whoCanBuy.push(e.region.owner);
+            if(e.region.owner.regionsCanBuyAll.includes(regionInteractive[e.near.bottom]) === false) {
+                e.region.owner.regionsCanBuyAll.push(regionInteractive[e.near.bottom])
+            };
         }
         team.regionOwner.includes(e.region) ? team.regionOwner.splice(e.region) : team.regionOwner.push(e.region);
         game.teams.all.forEach((t) => {
             e.classList.remove(t.regionStyleName);
         })
+        if(team.regionsCanBuyAll.includes(e)) {
+            team.regionsCanBuyAll = team.regionsCanBuyAll.filter((i) => i !== e);
+        };
         e.classList.add(team.regionStyleName);
         e.ico.classList.add('hidden');
         
@@ -772,14 +792,16 @@ let popup = document.createElement('div'),
 let dashboardContainer = document.querySelector('.dashboard');
 
 let dashboardGenerate = function() {
-    dashboardContainer.innerHTML = '';
+    dashboardContainer.querySelectorAll('.team').forEach((e) => {
+        e.classList.add('hidden');
+    });
     game.teams.all.forEach((e) => {
         let resourcesInner = '';
         for(let prop in e.resourcesOwner) {
             resourcesInner += `<div class="group">`;
             for(let res in e.resourcesOwner[prop]) {
                 resourcesInner += `<div class="item">
-                    <img src="images/ico/${res}.svg" alt="${res}">
+                    <img src="${mapSet.resourcesIcoLink[res]}" alt="${res}">
                     <span class="number">${e.resourcesOwner[prop][res]}</span>
                 </div>`;
             };
@@ -822,8 +844,12 @@ let dashboardGenerate = function() {
             </div>
         `
     
-        ) 
+        )
+        dashboardContainer.querySelectorAll('.hidden').forEach((e) => {
+            e.remove();
+        }) 
     })
+    
 }
 
 
