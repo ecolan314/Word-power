@@ -70,8 +70,8 @@ let game = {
             }
         },
         questionsDB: [
-            {tabName: 'eng-word', id: 0, name: 'English words (B1)', checked: true},
-            {tabName: 'uk-ua', id: 1, name: 'Питання на загальні теми'},
+            {tabName: 'eng-word', id: 0, name: 'English words (B1)', checked: true, q: 200},
+            {tabName: 'uk-ua', id: 1, name: 'Питання на загальні теми', q: 78},
         ]
     }
 };
@@ -784,7 +784,7 @@ let initGame = function () {
         service.classList.add('service');
     
         let questionData = [],
-            questionDataQ = 200,
+            questionDataQ = game.set.questionsDB[game.set.thisGame.questionsDBNum].q,
             questionNumberData = '',
             questionNumberRandomAll = [];
     
