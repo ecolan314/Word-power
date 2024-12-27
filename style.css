@@ -158,6 +158,31 @@ body {
     max-width: 600px;
 }
 
+.popup .wrapper h1 {
+    font-size: 40px;
+    font-weight: 900;
+}
+
+.popup .wrapper p {
+    font-size: 20px;
+    margin: 16px 0;
+}
+
+.popup .wrapper button {
+    padding: 8px 32px;
+    background-color: #000;
+    text-align: center;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    font-size: 24px;
+    margin: 8px auto;
+    cursor: pointer;
+    transition: background-color .3s;
+    width: 100%;
+    font-weight: 900;
+}
+
 .popup .wrapper .question {
     margin: 8px 0 24px;
     text-align: center;
@@ -169,13 +194,22 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+    margin: 16px 0;
 }
+
+.popup .wrapper .answers legend {
+    font-size: 20px;
+    margin: 8px 0;
+    font-weight: 700;
+}
+
 
 .popup .wrapper .answer-var label {
     display: block;
     padding: 8px 16px;
     background-color: #00000020;
     border-radius: 16px;
+    transition: color .5s, background-color .3s;
 }
 
 .popup .wrapper .answer-var input {
@@ -184,6 +218,12 @@ body {
 
 .popup .wrapper .answer-var input:checked + label {
     background-color: #ffcc00;
+}
+
+.popup.start-block .wrapper .answers:disabled .answer-var label {
+    background-color: #dbdbdb60;
+    color: #00000050;
+    transition: color .5s, background-color .3s;
 }
 
 .popup .wrapper .service {
