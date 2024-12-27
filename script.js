@@ -768,7 +768,14 @@ let initGame = function () {
 
         if(game.whoStep.pvc === true) {
             setTimeout(() => {
-                newQuestion(game.whoStep.regionsCanBuyAll[Math.floor(Math.random() * game.whoStep.regionsCanBuyAll.length)]);
+                let pvcRegionChoiceCalc = function() {
+                    return Math.floor(Math.random() * game.whoStep.regionsCanBuyAll.length)
+                };
+                let pvcRegionChoice = pvcRegionChoiceCalc();
+                if(game.whoStep.regionsCanBuyAll[pvcRegionChoice].resources[0].count === undefined && game.set.thisGame.pvcDifficulty === 'normal') {
+                    pvcRegionChoice = pvcRegionChoiceCalc();
+                }
+                newQuestion(game.whoStep.regionsCanBuyAll[pvcRegionChoice]);
             }, 1500);
             let blockScreen = document.createElement('div');
             blockScreen.classList.add('block-screen');
