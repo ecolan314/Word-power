@@ -227,10 +227,14 @@ let initGame = function () {
             game.teams.q++;
         }
     }
-    
-    
-    let teamOne = new Team('Огурчик','team-one');
-    let teamTwo = new Team('Помідорчик','team-two');
+
+    if(game.set.thisGame.gamers === 'pvc') {
+        let teamOne = new Team('Огурчик','team-one');
+        let teamTwo = new Team('Помідорчик','team-two', true);
+    } else {
+        let teamOne = new Team('Огурчик','team-one');
+        let teamTwo = new Team('Помідорчик','team-two');
+    }
     
     game.whoStep = game.teams.all[0];
     
@@ -761,6 +765,16 @@ let initGame = function () {
         if(nextQuestion > questionData.length - 5) {
             loadNewQuestions();
         }
+
+        if(game.whoStep.pvc === true) {
+            setTimeout(() => {
+                newQuestion(game.whoStep.regionsCanBuyAll[Math.floor(Math.random() * game.whoStep.regionsCanBuyAll.length)]);
+            }, 1500);
+            let blockScreen = document.createElement('div');
+            blockScreen.classList.add('block-screen');
+            document.body.append(blockScreen);
+            
+        }
     }
     
     
@@ -838,6 +852,7 @@ let initGame = function () {
         let newQuestion = function (newQuestionRegion) {
             question.textContent = questionData[nextQuestion].Q;
             answersWrapper.innerHTML = '';
+            let variantsForPVC = [];
             for(let i = 0; i < 4; i++) {
                 let variant = document.createElement('div');
                 let input = document.createElement('input');
@@ -853,36 +868,64 @@ let initGame = function () {
                 input.id = varData;
                 label.htmlFor = varData;
                 label.addEventListener('click', (e) => {
-                    if (input.checked === true) {
-                        answersWrapper.disabled = true;
-                        if (input.id === ('V' + questionData[nextQuestion].A)) {
-                            service.classList.add('success');
-                            service.textContent = "відповідь правильна, ви захопили новий регіон";
-                            newQuestionRegion.changeActive(game.whoStepNow());
-                            newQuestionRegion.classList.remove('active');
-                            newQuestionRegion.ico.classList.add('hidden');
-                            newQuestionRegion.whoCanBuy = [];
-                        } else {
-                            service.classList.add('wrong');
-                            service.textContent = `ви помилились, відповідь: ${questionData[nextQuestion][('V' + questionData[nextQuestion].A)]}`;
-                        };
-                        setTimeout(() => {
-                            service.classList.remove('success', 'wrong');
-                            service.textContent = "";
-                            popup.classList.add('hidden');
-                            nextStep();
-                            nextQuestion++;
-                            dashboardGenerate();
-                            answersWrapper.disabled = false;
-                        },2000)
-                    } else{
-                        service.textContent = "натисніть ще раз для підтвердження";
-                    }
+                    newQuestionChoiceListener(newQuestionRegion, input);
                 })
+                variantsForPVC.push(label);
             }
-    
+            if(game.whoStep.pvc === true) {
+                let r = Math.random();
+                let i = Math.floor(r * variantsForPVC.length);
+                
+                if (r < game.set.pvc.difficulty[game.set.thisGame.pvcDifficulty].coef) {
+                    i = questionData[nextQuestion].A - 1;
+                } else {
+                    for (let y = 1; y < 2; y++) {
+                        if (i === questionData[nextQuestion].A - 1) {
+                            y = 0;
+                            i = Math.floor(Math.random() * variantsForPVC.length);
+                        }
+                    } 
+                }
+                setTimeout(() => {
+                    variantsForPVC[i].click();
+                }, 1500);
+                setTimeout(() => {
+                    variantsForPVC[i].click();
+                    if(document.querySelector('.block-screen')) {
+                        document.querySelector('.block-screen').remove();
+                    }
+                }, 3000);
+            }
             popup.classList.remove('hidden');
     
+        }
+
+        let newQuestionChoiceListener = function (newQuestionRegion, input) {
+            if (input.checked === true) {
+                answersWrapper.disabled = true;
+                if (input.id === ('V' + questionData[nextQuestion].A)) {
+                    service.classList.add('success');
+                    service.textContent = "відповідь правильна, ви захопили новий регіон";
+                    newQuestionRegion.changeActive(game.whoStepNow());
+                    newQuestionRegion.classList.remove('active');
+                    newQuestionRegion.ico.classList.add('hidden');
+                    newQuestionRegion.whoCanBuy = [];
+                } else {
+                    service.classList.add('wrong');
+                    service.textContent = `ви помилились, відповідь: ${questionData[nextQuestion][('V' + questionData[nextQuestion].A)]}`;
+                };
+                setTimeout(() => {
+                    service.classList.remove('success', 'wrong');
+                    service.textContent = "";
+                    popup.classList.add('hidden');
+                    nextStep();
+                    nextQuestion++;
+                    dashboardGenerate();
+                    answersWrapper.disabled = false;
+                },2000)
+            } else{
+                service.textContent = "натисніть ще раз для підтвердження";
+            }
         }
     
     

@@ -143,6 +143,14 @@ body {
     -webkit-backdrop-filter: blur(2px);
 }
 
+.block-screen {
+    display: block;
+    position: absolute;
+    z-index: 3;
+    width: 100vw;
+    height: 100vh;
+}
+
 .popup.hidden {
     display: none;
     opacity: 0;
