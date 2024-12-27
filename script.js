@@ -14,6 +14,7 @@ servicePopup.style.borderRadius = '16px',
 servicePopup.style.margin = '8px',
 servicePopup.style.opacity = 0,
 servicePopup.style.transition = 'opacity .5s';
+servicePopup.style.zIndex = 5;
 
 document.body.append(servicePopup);
 

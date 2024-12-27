@@ -139,6 +139,8 @@ body {
     opacity: 1;
     transition: opacity .5s;
     top: 0;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .popup.hidden {
