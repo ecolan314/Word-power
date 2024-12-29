@@ -89,7 +89,7 @@ let startBlockGenerate = function () {
             </div>
             <div class="answer-var">
             <input type="radio" name="game-mode" id="pvc" value="pvc" onclick="document.querySelector('#pvc-difficulty').disabled = false;game.set.thisGame.gamers = 'pvc'" checked>
-            <label for="pvc">Гравець проти комп'ютера</label>
+            <label for="pvc">Гравець проти котика</label>
             </div>
         `;
     let gameSetPvc = '';
@@ -124,7 +124,7 @@ let startBlockGenerate = function () {
         ${gameSetPlayer}
         </fieldset>
         <fieldset id="pvc-difficulty" class="answers">
-        <legend>Оберіть складність гри з комп'ютером:</legend>
+        <legend>Оберіть складність гри з котиком:</legend>
         ${gameSetPvc}
         </fieldset>
         <fieldset class="answers">
@@ -230,7 +230,7 @@ let initGame = function () {
 
     if(game.set.thisGame.gamers === 'pvc') {
         let teamOne = new Team('Огурчик','team-one');
-        let teamTwo = new Team(`Комп'ютер`,'team-two', true);
+        let teamTwo = new Team(`Мурчик`,'team-two', true);
     } else {
         let teamOne = new Team('Огурчик','team-one');
         let teamTwo = new Team('Помідорчик','team-two');
@@ -906,6 +906,7 @@ let initGame = function () {
                 variantsForPVC.push(label);
             }
             if(game.whoStep.pvc === true) {
+                wrapper.classList.add('pvc');
                 let r = Math.random();
                 let i = Math.floor(r * variantsForPVC.length);
                 
@@ -955,6 +956,7 @@ let initGame = function () {
                     nextQuestion++;
                     dashboardGenerate();
                     answersWrapper.disabled = false;
+                    wrapper.classList.remove('pvc');
                 },2000)
             } else{
                 service.textContent = "натисніть ще раз для підтвердження";

@@ -18,7 +18,7 @@ body {
     background-color: #497d57;
     display: flex;
     width: 100%;
-    max-height: 100vh;
+    max-height: 100%;
 }
 
 .map > svg {
@@ -31,6 +31,13 @@ body {
     position: relative;
     width: 100%;
     max-height: 100vh;
+}
+.wrapper.pvc::after {
+    content: url('/images/ico/cat.svg');
+    display: block;
+    position: absolute;
+    top: -116px;
+    left: calc(50% - 87px);
 }
 
 @media(max-aspect-ratio:1) {
@@ -148,7 +155,7 @@ body {
     position: absolute;
     z-index: 3;
     width: 100vw;
-    height: 100vh;
+    height: 100%;
 }
 
 .popup.hidden {
