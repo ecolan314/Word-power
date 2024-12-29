@@ -816,7 +816,7 @@ let initGame = function () {
             downloadErrorCounter = 0;
     
         let loadNewQuestions = function(firstly) {
-            if (firstly === 'firstly') {
+            if (firstly === 'firstly' && !document.querySelector('block-dissplay')) {
                 let blockDisplay = document.createElement('div');
                 blockDisplay.classList.add('popup', 'block-display');
                 document.body.append(blockDisplay);
@@ -848,9 +848,6 @@ let initGame = function () {
                 } ;
             })
             .then(() => {
-                if (firstly === 'firstly') {
-                    document.querySelector('.block-display').remove();
-                }
                 serviceMessage.close();
             })
             .catch((error) => {
@@ -867,11 +864,16 @@ let initGame = function () {
                             serviceMessage.close();
                         }, 8000)
                         setTimeout( () => {
-                            loadNewQuestions();
+                            loadNewQuestions('firstly');
                         }, 10000)
                     }, 1000)
                 }
-            })            
+            })
+            .finally(() => {
+                if (firstly === 'firstly') {
+                    document.querySelector('.block-display').remove();
+                }
+            })           
         } 
     
     
