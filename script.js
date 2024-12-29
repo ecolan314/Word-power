@@ -727,7 +727,7 @@ let initGame = function () {
             if (status === 'preLoad' ) {
     
             } else {
-                t.points += p.resources + p.group + p.regions;
+                t.points += p.resources + p.group * 2 + p.regions;
             } 
             t.pointsData = p;
             t.pointsData.total = p.resources + p.group + p.regions;
@@ -1002,7 +1002,7 @@ let initGame = function () {
                         <div class="group total">
                             <div class="item">
                                 <span>Колекцій</span>
-                                <span class="number">${e.pointsData.group}</span>
+                                <span class="number">${e.pointsData.group}</span><span style="color: #999; margin-left: 4px">(х2)</span>
                             </div>
                             <div class="item">
                                 <span>Регіонів</span>
