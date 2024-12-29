@@ -33,7 +33,7 @@ body {
     max-height: 100vh;
 }
 .wrapper.pvc::after {
-    content: url('/images/ico/cat.svg');
+    content: url('images/ico/cat.svg');
     display: block;
     position: absolute;
     top: -116px;
