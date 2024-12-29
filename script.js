@@ -84,7 +84,7 @@ let game = {
 let startBlockGenerate = function () {
     let gameSetPlayer = `
             <div class="answer-var">
-            <input type="radio" name="game-mode" id="pvp" value="pvp" onclick="document.querySelector('#pvc-difficulty').disabled = true";game.set.thisGame.gamers = 'pvp'>
+            <input type="radio" name="game-mode" id="pvp" value="pvp" onclick="document.querySelector('#pvc-difficulty').disabled = true;game.set.thisGame.gamers = 'pvp'">
             <label for="pvp">Грати вдвох</label>
             </div>
             <div class="answer-var">
@@ -866,7 +866,7 @@ let initGame = function () {
                         setTimeout( () => {
                             loadNewQuestions('firstly');
                         }, 10000)
-                    }, 1000)
+                    }, 2000)
                 }
             })
             .finally(() => {
