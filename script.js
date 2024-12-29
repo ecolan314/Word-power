@@ -24,7 +24,7 @@ document.body.append(servicePopup);
 
 let serviceMessage = {
     open: function(text) {
-        servicePopup.textContent = text;
+        servicePopup.innerHTML = text;
         servicePopup.style.display = 'block';
         servicePopup.style.opacity = 0;
         setTimeout(() => {
@@ -66,7 +66,7 @@ let game = {
                 },
                 normal: {
                     name: 'нормально',
-                    coef: .8
+                    coef: .9
                 }
             }
         },
@@ -230,7 +230,7 @@ let initGame = function () {
 
     if(game.set.thisGame.gamers === 'pvc') {
         let teamOne = new Team('Огурчик','team-one');
-        let teamTwo = new Team('Помідорчик','team-two', true);
+        let teamTwo = new Team(`Комп'ютер`,'team-two', true);
     } else {
         let teamOne = new Team('Огурчик','team-one');
         let teamTwo = new Team('Помідорчик','team-two');
@@ -774,7 +774,11 @@ let initGame = function () {
                 let pvcRegionChoice = pvcRegionChoiceCalc();
                 if(game.whoStep.regionsCanBuyAll[pvcRegionChoice].resources[0].count === undefined && game.set.thisGame.pvcDifficulty === 'normal') {
                     pvcRegionChoice = pvcRegionChoiceCalc();
-                }
+                };
+                if(game.whoStep.regionsCanBuyAll[pvcRegionChoice].resources[0].count === undefined && game.set.thisGame.pvcDifficulty === 'normal') {
+                    pvcRegionChoice = pvcRegionChoiceCalc();
+
+                };
                 newQuestion(game.whoStep.regionsCanBuyAll[pvcRegionChoice]);
             }, 1500);
             let blockScreen = document.createElement('div');
@@ -808,7 +812,8 @@ let initGame = function () {
         let questionData = [],
             questionDataQ = game.set.questionsDB[game.set.thisGame.questionsDBNum].q,
             questionNumberData = '',
-            questionNumberRandomAll = [];
+            questionNumberRandomAll = [],
+            downloadErrorCounter = 0;
     
         let loadNewQuestions = function(firstly) {
             if (firstly === 'firstly') {
@@ -832,7 +837,8 @@ let initGame = function () {
             
             fetch (`https://script.google.com/macros/s/AKfycby4ieWE4JGyFkMNx4L5w3ctrOo2Grg9qfrBvKW9NL8VGyTbTWkBQwYH8daraVlYsiij/exec?tab=${game.set.questionsDB[game.set.thisGame.questionsDBNum].tabName}&id=` + questionNumberRandom,  {
                 mode: 'cors'
-            }).then(serviceMessage.open('Завантажуємо питання'))
+            })
+            .then(serviceMessage.open('Завантажуємо питання'))
             .then((response) => response.json())
             .then((data) => {
                 if (data.goods.length > 0) {
@@ -841,14 +847,32 @@ let initGame = function () {
                     })
                 } ;
             })
-            .finally(()=>{
-                serviceMessage.close();
+            .then(() => {
                 if (firstly === 'firstly') {
                     document.querySelector('.block-display').remove();
                 }
+                serviceMessage.close();
             })
-            
-        }
+            .catch((error) => {
+                if (firstly === 'firstly' && downloadErrorCounter < 1) {
+                    loadNewQuestions();
+                    downloadErrorCounter++;
+                } else {
+                    serviceMessage.close();
+                    setTimeout( () => {
+                        serviceMessage.open(`При завантаженні питань виникла помилка. Перевірте чи є доступ до інтернету`);
+                        console.log('error', 'question downloading error: ', error);
+                        downloadErrorCounter = 0;
+                        setTimeout( () => {
+                            serviceMessage.close();
+                        }, 8000)
+                        setTimeout( () => {
+                            loadNewQuestions();
+                        }, 10000)
+                    }, 1000)
+                }
+            })            
+        } 
     
     
     
