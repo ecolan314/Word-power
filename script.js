@@ -84,13 +84,14 @@ let game = {
 let startBlockGenerate = function () {
     let gameSetPlayer = `
             <div class="answer-var">
-            <input type="radio" name="game-mode" id="pvp" value="pvp" onclick="document.querySelector('#pvc-difficulty').disabled = true;game.set.thisGame.gamers = 'pvp'">
-            <label for="pvp">Грати вдвох</label>
-            </div>
-            <div class="answer-var">
             <input type="radio" name="game-mode" id="pvc" value="pvc" onclick="document.querySelector('#pvc-difficulty').disabled = false;game.set.thisGame.gamers = 'pvc'" checked>
             <label for="pvc">Гравець проти котика</label>
             </div>
+            <div class="answer-var">
+            <input type="radio" name="game-mode" id="pvp" value="pvp" onclick="document.querySelector('#pvc-difficulty').disabled = true;game.set.thisGame.gamers = 'pvp'">
+            <label for="pvp">Грати вдвох</label>
+            </div>
+
         `;
     let gameSetPvc = '';
     for (let i in game.set.pvc.difficulty) {
@@ -117,7 +118,6 @@ let startBlockGenerate = function () {
         <div class="wrapper">
         <h1>Колонізація</h1>
         <p>Захоплюйте регіони, збирайте колекції ресурсів. Переможе той, хто отримає найбільше балів впливу.</p>
-        <p>Щоб захопити регіон, потрібно правильно відповісти на питання.</p>
         <form>
         <fieldset class="answers">
         <legend>Оберіть кількість гравців:</legend>
@@ -127,6 +127,7 @@ let startBlockGenerate = function () {
         <legend>Оберіть складність гри з котиком:</legend>
         ${gameSetPvc}
         </fieldset>
+        <p>Щоб захопити регіон, потрібно правильно відповісти на питання.</p>
         <fieldset class="answers">
         <legend>Оберіть тематику питань:</legend>
         ${gameSetData}
