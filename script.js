@@ -150,8 +150,8 @@ startBlockGenerate();
 
 let initGame = function () {
     let mapSize = {
-        x: 2,
-        y: 2,
+        x: 8,
+        y: 8,
         sizeX: 1000,
         sizeY: 1000,
     };
