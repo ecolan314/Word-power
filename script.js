@@ -150,8 +150,8 @@ startBlockGenerate();
 
 let initGame = function () {
     let mapSize = {
-        x: 8,
-        y: 8,
+        x: 2,
+        y: 2,
         sizeX: 1000,
         sizeY: 1000,
     };
@@ -653,9 +653,10 @@ let initGame = function () {
             game.teams.all.forEach((t) => {
                 e.classList.remove(t.regionStyleName);
             })
-            if(team.regionsCanBuyAll.includes(e)) {
-                team.regionsCanBuyAll = team.regionsCanBuyAll.filter((i) => i !== e);
-            };
+
+            e.whoCanBuy.forEach((t) => {
+                t.regionsCanBuyAll = t.regionsCanBuyAll.filter((i) => i !== e);
+            })
             e.classList.add(team.regionStyleName);
             e.ico.classList.add('hidden');
             
@@ -745,6 +746,31 @@ let initGame = function () {
     // step choice
     
     function nextStep() {
+        if(game.whoStep.regionsCanBuyAll.length == 0) {
+            let winResults = '';
+            let winner = {name: '', points: 0};
+            game.teams.all.forEach((t) => {
+                winResults += '<p>' + t.name + ' - ' + t.points + ' б.</p>';
+                if (t.points > winner.points) {
+                    winner = {name: t.name, points: t.points}
+                } else if (t.points === winner.points) {
+                    winner = {name: 'Ніхто не ', points: t.points}
+                }
+            })
+            let finishBlock = document.createElement('div');
+            document.body.append(finishBlock);
+            finishBlock.classList.add('start-block', 'popup');
+
+            finishBlock.insertAdjacentHTML('beforeend', `
+                <div class="wrapper">
+                <h1>${winner.name} переміг ${winner.name === 'Ніхто не ' ? '' : 'з результатом ' + winner.points + ' б.'}</h1>
+                ${winResults}
+                <div class="service success"></div>
+                </div>
+            `)
+            document.body.append(finishBlock);
+            return;
+        }
     
         
         game.nextStepWhoCounter++;
@@ -777,14 +803,12 @@ let initGame = function () {
                 };
                 if(game.whoStep.regionsCanBuyAll[pvcRegionChoice].resources[0].count === undefined && game.set.thisGame.pvcDifficulty === 'normal') {
                     pvcRegionChoice = pvcRegionChoiceCalc();
-
                 };
                 newQuestion(game.whoStep.regionsCanBuyAll[pvcRegionChoice]);
             }, 1500);
             let blockScreen = document.createElement('div');
             blockScreen.classList.add('block-screen');
             document.body.append(blockScreen);
-            
         }
     }
     
