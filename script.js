@@ -731,7 +731,7 @@ let initGame = function () {
                 t.points += p.resources + p.group * 2 + p.regions;
             } 
             t.pointsData = p;
-            t.pointsData.total = p.resources + p.group + p.regions;
+            t.pointsData.total = p.resources + p.group * 2 + p.regions;
         });
     
         
